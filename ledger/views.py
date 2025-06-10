@@ -92,16 +92,16 @@ def delete_transaction(request, pk):
 
 
 
-#계좌 삭제
-def delete_account_view(request, pk):
-    try:
-        account = Account.objects.get(pk=pk)
-    except Account.DoesNotExist:
-        return JsonResponse({"error": "계좌가 존재하지 않습니다."}, status=404)
-
-    if account.user != request.user:
-        return JsonResponse({"error": "권한이 없습니다."}, status=403)
-
-    account.delete()
-    return JsonResponse({"message": "계좌가 삭제되었습니다."})
+# #계좌 삭제
+# def delete_account_view(request, pk):
+#     try:
+#         account = Account.objects.get(pk=pk)
+#     except Account.DoesNotExist:
+#         return JsonResponse({"error": "계좌가 존재하지 않습니다."}, status=404)
+#
+#     if account.user != request.user:
+#         return JsonResponse({"error": "권한이 없습니다."}, status=403)
+#
+#     account.delete()
+#     return JsonResponse({"message": "계좌가 삭제되었습니다."})
 
