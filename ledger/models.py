@@ -22,7 +22,7 @@ class Account(models.Model):
     balance = models.DecimalField(decimal_places=2, max_digits=20)
     initial_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.account_number
 
