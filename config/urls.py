@@ -25,8 +25,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("users/", ledger_views.user_list, name="user_list"),
     path("account/create/", ledger_views.create_account_view, name="account_create"),
-    path("account/<int:user_id>", ledger_views.account_list_view, name="account_list"),
+    path("account/<int:pk>", ledger_views.account_list_view, name="account_list"),
+    path("signup/", member_views.signup, name="signup"),
     path("login/", member_views.login, name="login"),
+    path("logout/", member_views.logout, name="logout"),
     path("transaction/update/<int:pk>", ledger_views.update_transaction, name="update_transaction"),
     path("transaction/delete/<int:pk>", ledger_views.delete_transaction, name="delete_transaction"),
 ]

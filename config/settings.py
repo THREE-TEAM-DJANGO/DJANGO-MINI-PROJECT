@@ -46,6 +46,7 @@ DJANGO_APPS = [
 
 OWN_AAPS = [
     "ledger",
+    "member",
 ]
 
 THIRD_PARTY_APPS = [
@@ -56,7 +57,7 @@ THIRD_PARTY_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + OWN_AAPS + THIRD_PARTY_APPS
 
-AUTH_USER_MODEL = 'ledger.User'
+AUTH_USER_MODEL = 'member.User'
 
 
 
@@ -145,3 +146,12 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # 또는 JWT
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}

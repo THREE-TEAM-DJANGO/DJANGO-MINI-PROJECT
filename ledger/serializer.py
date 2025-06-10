@@ -8,16 +8,15 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "name", "phone_number", "is_active", "is_admin"]
+        fields = ["name", "phone_number", "is_active", "is_admin"]
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True, many=True)
+    user = UserSerializer(read_only=True, many=False)
 
     class Meta:
         model = Account
         fields = [
-            "id",
             "user",
             "account_number",
             "balance",
@@ -25,15 +24,19 @@ class AccountSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-
+    def create(self, validated_data):
+        user = self.context.get("user")
+        if not user:
+            raise serializers.ValidationError("User 정보가 없습니다")
+        return Account.objects.create(user=user, **validated_data)
 
 class TransactionSerializer(serializers.ModelSerializer):
-    account = AccountSerializer(read_only=True, many=True)
+    account = AccountSerializer(read_only=True, many=False)
 
     class Meta:
         model = Transaction
         fields = [
-            "id",
+            "account",
             "amount",
             "transaction_type",
             "date",

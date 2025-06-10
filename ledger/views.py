@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from ledger.models import Account
@@ -27,14 +28,25 @@ def user_list(request):
 
 # 계좌 생성
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def create_account_view(request):
+    user_id = request.data.get("user")
+    user = get_object_or_404(User, pk=user_id)
+
+    serializer = AccountSerializer(data=request.data, context={"user": user})
+    if serializer.is_valid():
+        account = serializer.save()
+        return Response({"message": "계좌가 생성되었습니다", "account_number": account.account_number}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
     # if request.method == "POST":
     #
     #     user_id = request.GET.get('user_id')
     #     account_number = request.GET.get('account_number')
     #     initial_balance = request.GET.get('initial_balance')
     #
-    #     user = get_object_or_404(User, id=user_id)
+        # user = get_object_or_404(User, pk=pk)
     #
     #     account = Account.objects.create(
     #         user=user,
@@ -44,15 +56,19 @@ def create_account_view(request):
     #     )
     #     return JsonResponse({"message": "계좌가 생성되었습니다", "account_number": account.account_number})
 
-    serializer = AccountSerializer(data=request.data)
-    if serializer.is_valid():
-        account = serializer.save()
-        return Response({"message": "계좌가 생성되었습니다", "account_number": account.account_number}, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # data = request.data.copy()
+    # data["user"] = request.user.id
+
 
 # 계좌 리스트 조회
 @api_view(["GET"])
-def account_list_view(request, user_id):
+def account_list_view(request, pk):
+
+    accounts = Account.objects.filter(pk=pk)
+    serializer = AccountSerializer(accounts, many=True)
+    return Response(serializer.data)
+
+
     # accounts = Account.objects.filter(user_id=user_id)
     #
     # account_data = []
@@ -63,10 +79,6 @@ def account_list_view(request, user_id):
     #     "balance": account.balance,
     #     "created_at": account.created_at.strftime("%Y-%m-%d %H:%M:%S"),
     #     })
-
-    accounts = Account.objects.filter(user_id=user_id)
-    serializer = AccountSerializer(accounts, many=True)
-    return Response(serializer.data)
 
 
 
@@ -104,4 +116,5 @@ def delete_transaction(request, pk):
 #
 #     account.delete()
 #     return JsonResponse({"message": "계좌가 삭제되었습니다."})
+
 
