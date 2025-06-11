@@ -87,6 +87,7 @@ def account_list_view(request, pk):
 
 # 거래 수정
 @api_view(["PUT"])
+@permission_classes([AllowAny])
 def update_transaction(request, pk):
     transaction = get_object_or_404(Account, pk=pk)
     serializer = TransactionSerializer(transaction, data=request.data)
@@ -98,6 +99,7 @@ def update_transaction(request, pk):
 
 # 거래 삭제
 @api_view(["DELETE"])
+@permission_classes([AllowAny])
 def delete_transaction(request, pk):
     transaction = get_object_or_404(Account, pk=pk)
     transaction.delete()

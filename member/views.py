@@ -8,7 +8,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import login as django_login, logout as django_logout
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from ledger.serializer import UserSerializer
@@ -18,6 +19,7 @@ from member.serializer import LoginSerializer
 # Create your views here.
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def signup(request):
 
     serializer = UserSerializer(data=request.data)
@@ -41,6 +43,7 @@ def signup(request):
 
 
 @api_view(["GET","POST"])
+@permission_classes([AllowAny])
 def login(request):
     if request.method == "POST":
         serializer = LoginSerializer(data=request.data)
@@ -69,6 +72,7 @@ def login(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def logout(request):
     django_logout(request)
     return Response({"message": "로그아웃 하였습니다"}, status=status.HTTP_200_OK)
