@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 
 # Create your models here.
@@ -32,10 +33,11 @@ class MyUserManager(BaseUserManager):
         return user
 
 
-class User(AbstractUser):
+class User(AbstractUser, PermissionsMixin):
+    username = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=20)
-    phone_number = models.CharField(max_length=11, unique=True)
+    phone_number = models.CharField(max_length=11, unique=True, blank=True, null=True)
     is_admin = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.phone_number
+        return self.username

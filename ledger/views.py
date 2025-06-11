@@ -3,6 +3,7 @@ import json
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -61,7 +62,9 @@ def create_account_view(request):
 
 
 # 계좌 리스트 조회
+@extend_schema(methods=["GET"])
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def account_list_view(request, pk):
 
     accounts = Account.objects.filter(pk=pk)
@@ -83,7 +86,7 @@ def account_list_view(request, pk):
 
 
 # 거래 수정
-@api_view(["PUT, PATCH"])
+@api_view(["PUT"])
 def update_transaction(request, pk):
     transaction = get_object_or_404(Account, pk=pk)
     serializer = TransactionSerializer(transaction, data=request.data)

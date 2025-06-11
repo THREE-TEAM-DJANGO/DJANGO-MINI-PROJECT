@@ -38,6 +38,8 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = [
             "account",
             "amount",
+            "bank_code",
+            "analysis_type",
             "transaction_type",
             "date",
             "created_at",

@@ -10,7 +10,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'phone_number', 'password']
+        fields = ['name', 'phone_number', 'password']
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -23,7 +23,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
 # 로그인용 시리얼라이저
 class LoginSerializer(serializers.Serializer):
-    phone_number = serializers.CharField()
+    username = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):

@@ -17,12 +17,18 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from ledger import views as ledger_views
 from member import views as member_views
 
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path("users/", ledger_views.user_list, name="user_list"),
     path("account/create/", ledger_views.create_account_view, name="account_create"),
     path("account/<int:pk>", ledger_views.account_list_view, name="account_list"),
