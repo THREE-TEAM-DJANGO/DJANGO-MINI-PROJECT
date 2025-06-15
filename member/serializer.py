@@ -21,6 +21,7 @@ class UserListSerializer(serializers.ModelSerializer):
 
 # 회원가입용 시리얼라이저
 class UserSignupSerializer(serializers.ModelSerializer):
+    phone_number = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True)
 
     class Meta:
