@@ -19,22 +19,29 @@ from django.contrib import admin
 from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-from ledger import views as ledger_views
-from member import views as member_views
-
-
+from ledger.views import AccountCreateView, AccountListView, \
+    TransactionUpdateView, TransactionDeleteView, AccountDeleteView, TransactionListView, TransactionCreateView
+from member.views import SignUpView, LoginView, LogoutView, UserListView, PasswordResetView, \
+    UsernameFindView, UserDeleteView, UserUpdateView, TokenObtainView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path("users/", ledger_views.user_list, name="user_list"),
-    path("account/create/", ledger_views.create_account_view, name="account_create"),
-    path("account/<int:pk>", ledger_views.account_list_view, name="account_list"),
-    path("signup/", member_views.signup, name="signup"),
-    path("login/", member_views.login, name="login"),
-    path("logout/", member_views.logout, name="logout"),
-    path("transaction/update/<int:pk>", ledger_views.update_transaction, name="update_transaction"),
-    path("transaction/delete/<int:pk>", ledger_views.delete_transaction, name="delete_transaction"),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),    path("signup/", SignUpView.as_view(), name="signup"),
+    path("login/", LoginView.as_view(), name="login"),
+    path('api/token/', TokenObtainView.as_view(), name='token_obtain'),
+    path("logout/", LogoutView.as_view(), name="logout"),
+    path("api/user/", UserListView.as_view(), name="user_list"),
+    path('api/user/update/', UserUpdateView.as_view(), name='user-update'),
+    path('api/user/delete/', UserDeleteView.as_view(), name='user-delete'),
+    path('api/find-username/', UsernameFindView.as_view(), name='find-username'),
+    path('api/reset-password/', PasswordResetView.as_view(), name='reset-password'),
+    path("api/account/", AccountListView.as_view(), name="account_list"),
+    path("api/account/create/", AccountCreateView.as_view(), name="account_create"),
+    path('api/accounts/delete/<int:pk>/', AccountDeleteView.as_view()),
+    path('api/transactions/', TransactionListView.as_view()),
+    path('api/transactions/create/', TransactionCreateView.as_view()),
+    path("api/transaction/update/<int:pk>/", TransactionUpdateView.as_view, name="update_transaction"),
+    path("api/transaction/delete/<int:pk>/", TransactionDeleteView.as_view, name="delete_transaction"),
 ]

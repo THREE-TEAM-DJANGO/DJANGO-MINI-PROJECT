@@ -2,19 +2,14 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from ledger.models import Account, Transaction
+from member.serializer import UserListSerializer
 
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["username", "is_active", "is_admin"]
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+
 
 class AccountSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True, many=False)
+    user = UserListSerializer(read_only=True, many=False)
 
     class Meta:
         model = Account
@@ -26,6 +21,8 @@ class AccountSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+        read_only_fields = ["user", "account_number","created_at"]
+
     def create(self, validated_data):
         user = self.context.get("user")
         if not user:
