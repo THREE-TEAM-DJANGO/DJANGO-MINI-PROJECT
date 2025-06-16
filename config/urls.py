@@ -42,6 +42,6 @@ urlpatterns = [
     path('api/accounts/delete/<int:pk>/', AccountDeleteView.as_view()),
     path('api/transactions/', TransactionListView.as_view()),
     path('api/transactions/create/', TransactionCreateView.as_view()),
-    path("api/transaction/update/<int:pk>/", TransactionUpdateView.as_view, name="update_transaction"),
-    path("api/transaction/delete/<int:pk>/", TransactionDeleteView.as_view, name="delete_transaction"),
+    path("api/transaction/update/<int:pk>/", TransactionUpdateView.as_view(), name="update_transaction"),
+    path("api/transaction/delete/<int:pk>/", TransactionDeleteView.as_view(), name="delete_transaction"),
 ]
