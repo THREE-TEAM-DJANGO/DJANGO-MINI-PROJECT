@@ -7,7 +7,6 @@ from member.serializer import UserListSerializer
 User = get_user_model()
 
 
-
 class AccountSerializer(serializers.ModelSerializer):
     user = UserListSerializer(read_only=True, many=False)
 
@@ -21,7 +20,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["user", "account_number","created_at"]
+        read_only_fields = ["user", "created_at"]
 
     def create(self, validated_data):
         user = self.context.get("user")
@@ -29,8 +28,9 @@ class AccountSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("User 정보가 없습니다")
         return Account.objects.create(user=user, **validated_data)
 
+
 class TransactionSerializer(serializers.ModelSerializer):
-    account = AccountSerializer(read_only=True, many=False)
+    account = serializers.PrimaryKeyRelatedField(queryset=Account.objects.all())
 
     class Meta:
         model = Transaction

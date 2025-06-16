@@ -9,10 +9,10 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+
 import json
+from datetime import timedelta
 from pathlib import Path
-
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,17 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-with open(BASE_DIR / '.config_secret' / 'secret.json') as f:
+with open(BASE_DIR / ".config_secret" / "secret.json") as f:
     config_secret_str = f.read()
 
 SECRET = json.loads(config_secret_str)
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECRET['DJANGO_SECRET_KEY']
+SECRET_KEY = SECRET["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list[str] = ["localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -54,15 +54,14 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "drf_yasg",
     "drf_spectacular",
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 
 INSTALLED_APPS = DJANGO_APPS + OWN_AAPS + THIRD_PARTY_APPS
 
-AUTH_USER_MODEL = 'member.User'
-
+AUTH_USER_MODEL = "member.User"
 
 
 MIDDLEWARE = [
@@ -129,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 # Internationalization
@@ -158,26 +157,36 @@ REST_FRAMEWORK = {
     # 'DEFAULT_AUTHENTICATION_CLASSES': [
     #     'rest_framework.authentication.TokenAuthentication',  # 또는 JWT
     # ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
 
-REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'token'
-JWT_AUTH_REFRESH_COOKIE = 'refresh_token'
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),  # Access token 1일 유지
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # 리프레시 토큰 유효기간
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+}
 
+
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = "token"
+JWT_AUTH_REFRESH_COOKIE = "refresh_token"
 
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Your Project API',
-    'DESCRIPTION': 'Your project description',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "Your Project API",
+    "DESCRIPTION": "Your project description",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
     # OTHER SETTINGS
 }

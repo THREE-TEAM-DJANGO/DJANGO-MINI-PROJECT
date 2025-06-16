@@ -1,20 +1,30 @@
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import login as django_login
+from django.contrib.auth import logout as django_logout
 from django.shortcuts import render
+from rest_framework import permissions, status
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.serializers import TokenObtainSerializer, TokenObtainPairSerializer, \
+    TokenRefreshSerializer
+
+from member.serializer import (
+    LogoutSerializer,
+    PasswordResetSerializer,
+    UserListSerializer,
+    UsernameFindSerializer,
+    UserSignupSerializer,
+    LoginAndTokenSerializer,
+)
 
 # Create your views here.
 
-from django.contrib.auth import login as django_login, logout as django_logout, get_user_model, authenticate
-from rest_framework import status, permissions
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.serializers import TokenObtainSerializer
 
-from member.serializer import LoginSerializer, UserSignupSerializer, LogoutSerializer, \
-    UserListSerializer, PasswordResetSerializer, UsernameFindSerializer
 
 User = get_user_model()
 # Create your views here.
-
 
 
 class UserListView(APIView):
@@ -33,8 +43,11 @@ class SignUpView(APIView):
         serializer = UserSignupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "회원가입 되었습니다"}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "회원가입 되었습니다"}, status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     # form =UserCreationForm(request.POST or None)    # 아래 코드와 같음
     # if form.is_valid():
     #     form.save()
@@ -46,28 +59,25 @@ class SignUpView(APIView):
     # return render(request, "", context)
 
 
-class TokenObtainView(APIView):
-    permission_classes = [permissions.AllowAny]
-    def post(self, request):
-        serializer = TokenObtainSerializer(data=request.data)
-        if serializer.is_valid():
-            return Response(serializer.validated_data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class LoginView(APIView):
+class LoginAndTokenView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         return Response({"message": "로그인 페이지입니다"}, status=status.HTTP_200_OK)
 
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = LoginAndTokenSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data['user']
-            django_login(request, user)
-            return Response({"message": "로그인 하였습니다"}, status=status.HTTP_200_OK)
+            user = authenticate(
+                username=request.data.get("username"), password=request.data.get("password")
+            )
+            if user:
+                django_login(request, user)
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     # form = AuthenticationForm(request, request.POST or None)
     # if form.is_valid():
     #     django_login(request, form.get_user())
@@ -85,34 +95,54 @@ class LoginView(APIView):
     # return render(request, '', context)
 
 
+class TokenRefreshAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = TokenRefreshSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
 class UserUpdateView(APIView):
     permission_classes = [IsAuthenticated]
-    #회원 수정
-    def patch(self, request):
-        serializer = UserListSerializer(request.user, data=request.data, partial=True)
+
+    # 회원 수정
+    def patch(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserListSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserDeleteView(APIView):
     permission_classes = [IsAuthenticated]
-    # 회원 삭제
-    def delete(self, request):
-        request.user.delete()
-        return Response({"message": "Deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+    # 회원 삭제
+    def delete(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        user.delete()
+        return Response(
+            {"message": "Deleted successfully"}, status=status.HTTP_204_NO_CONTENT
+        )
 
 
 class LogoutView(APIView):
     permission_classes = [permissions.AllowAny]  # 또는 IsAuthenticated로 변경 가능
 
-
     def post(self, request):
         serializer = LogoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"message": "로그아웃 되었습니다."}, status=status.HTTP_205_RESET_CONTENT)
+        return Response(
+            {"message": "로그아웃 되었습니다."}, status=status.HTTP_205_RESET_CONTENT
+        )
+
     # form = AuthenticationForm(request, request.POST or None)
     # if form.is_valid():
     #     django_login(request, form.get_user())
@@ -132,6 +162,8 @@ class LogoutView(APIView):
 
 # 아이디(Username) 찾기
 class UsernameFindView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         serializer = UsernameFindSerializer(data=request.data)
         if serializer.is_valid():
@@ -146,5 +178,8 @@ class PasswordResetView(APIView):
         serializer = PasswordResetSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "비밀번호가 성공적으로 변경되었습니다."}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "비밀번호가 성공적으로 변경되었습니다."},
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

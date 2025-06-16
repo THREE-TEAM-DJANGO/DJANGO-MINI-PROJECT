@@ -5,7 +5,6 @@ from django.db import models
 from ledger.constants import ANALYSIS_TYPES, BANK_CODES, TRANSACTION_TYPE
 from member.models import User
 
-
 # Create your models here.
 
 
@@ -16,6 +15,7 @@ class Account(models.Model):
     initial_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return self.account_number
 

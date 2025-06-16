@@ -1,12 +1,15 @@
 import json
 
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, render
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import extend_schema
-from rest_framework import status, permissions
+from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from ledger.models import Account, Transaction
@@ -17,18 +20,12 @@ from ledger.serializer import AccountSerializer, TransactionSerializer
 User = get_user_model()
 
 
-
-
 # 계좌 생성
 class AccountCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        user_id = request.user
-        try:
-            user = get_object_or_404(User, pk=user_id)
-        except User.DoesNotExist:
-            return Response({"message": "해당 유저가 존재하지 않습니다"}, status=status.HTTP_404_NOT_FOUND)
+        user = request.user
 
         serializer = AccountSerializer(data=request.data, context={"user": user})
         if serializer.is_valid():
@@ -36,19 +33,20 @@ class AccountCreateView(APIView):
             return Response(
                 {
                     "message": "계좌가 생성되었습니다",
-                    "account_number": account.account_number
+                    "account_number": account.account_number,
                 },
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_201_CREATED,
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     # if request.method == "POST":
     #
     #     user_id = request.GET.get('user_id')
     #     account_number = request.GET.get('account_number')
     #     initial_balance = request.GET.get('initial_balance')
     #
-        # user = get_object_or_404(User, pk=pk)
+    # user = get_object_or_404(User, pk=pk)
     #
     #     account = Account.objects.create(
     #         user=user,
@@ -71,7 +69,6 @@ class AccountListView(APIView):
         serializer = AccountSerializer(accounts, many=True)
         return Response(serializer.data)
 
-
     # accounts = Account.objects.filter(user_id=user_id)
     #
     # account_data = []
@@ -83,6 +80,7 @@ class AccountListView(APIView):
     #     "created_at": account.created_at.strftime("%Y-%m-%d %H:%M:%S"),
     #     })
 
+
 class AccountDeleteView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -92,8 +90,9 @@ class AccountDeleteView(APIView):
         except Account.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         account.delete()
-        return Response({"message": "Deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-
+        return Response(
+            {"message": "Deleted successfully"}, status=status.HTTP_204_NO_CONTENT
+        )
 
 
 class TransactionCreateView(APIView):
@@ -102,9 +101,11 @@ class TransactionCreateView(APIView):
     def post(self, request):
         serializer = TransactionSerializer(data=request.data)
         if serializer.is_valid():
-            account = serializer.validated_data['account']
+            account = serializer.validated_data["account"]
             if account.user != request.user:
-                return Response({"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+                return Response(
+                    {"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN
+                )
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -114,9 +115,14 @@ class TransactionListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        account_id = request.GET.get('account')
-        ts_type = request.GET.get('type')
-        min_amount = request.GET.get('min_amount')
+        user = request.user
+        if not user.is_authenticated:
+            return Response({"error": "인증되지 않았습니다."}, status=401)
+
+
+        account_id = request.GET.get("account")
+        ts_type = request.GET.get("type")
+        min_amount = request.GET.get("min_amount")
 
         queryset = Transaction.objects.filter(account__user=request.user)
 
@@ -131,17 +137,20 @@ class TransactionListView(APIView):
         return Response(serializer.data)
 
 
-
 # 거래 수정
+@method_decorator(csrf_exempt, name='dispatch')  # 테스트용
 class TransactionUpdateView(APIView):
-    permission_classes = [permissions.AllowAny]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def put(self, request, pk):
         return self.update(request, pk)
 
     def update(self, request, pk):
         transaction = get_object_or_404(Account, pk=pk)
-        serializer = TransactionSerializer(transaction, data=request.data, partial=(request.method == "PATCH"))
+        serializer = TransactionSerializer(
+            transaction, data=request.data, partial=(request.method == "PATCH")
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -158,7 +167,6 @@ class TransactionDeleteView(APIView):
         return Response({"message": "삭제 완료"}, status=status.HTTP_204_NO_CONTENT)
 
 
-
 # #계좌 삭제
 # def delete_account_view(request, pk):
 #     try:
@@ -171,5 +179,3 @@ class TransactionDeleteView(APIView):
 #
 #     account.delete()
 #     return JsonResponse({"message": "계좌가 삭제되었습니다."})
-
-

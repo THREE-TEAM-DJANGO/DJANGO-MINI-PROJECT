@@ -46,8 +46,8 @@ jobs:
 		# Poetry를 설치합니다.
     - name: Install uv
       run: |
-		    curl -LsSf https://astral.sh/uv/install.sh | sh
-		    echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
 		# Poetry를 사용하여 의존성 패키지들을 설치합니다.
     - name: Install Packages & Libraries
@@ -79,6 +79,6 @@ jobs:
 
     # 도전 미션
     # django test를 사용하여 모든 앱의 테스트코드를 실행합니다.
-		- name: Test python project
+    - name: Test python project
       run: |
-        uv run python manage.py test
+          uv run python manage.py test
