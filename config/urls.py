@@ -59,7 +59,7 @@ urlpatterns = [
     path("api/reset-password/", PasswordResetView.as_view(), name="reset-password"),
     path("api/account/", AccountListView.as_view(), name="account_list"),
     path("api/account/create/", AccountCreateView.as_view(), name="account_create"),
-    path("api/accounts/delete/<int:pk>/", AccountDeleteView.as_view()),
+    path("api/account/delete/<int:pk>/", AccountDeleteView.as_view()),
     path("api/transactions/", TransactionListView.as_view()),
     path("api/transactions/create/", TransactionCreateView.as_view()),
     path("api/transaction/update/<int:pk>/", TransactionUpdateView.as_view, name="update_transaction",),
