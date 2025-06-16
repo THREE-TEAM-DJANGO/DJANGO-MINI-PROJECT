@@ -24,11 +24,7 @@ class AccountCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        user_id = request.user
-        try:
-            user = get_object_or_404(User, pk=user_id)
-        except User.DoesNotExist:
-            return Response({"message": "해당 유저가 존재하지 않습니다"}, status=status.HTTP_404_NOT_FOUND)
+        user = request.user
 
         serializer = AccountSerializer(data=request.data, context={"user": user})
         if serializer.is_valid():
