@@ -78,7 +78,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV='/Users/ijeongho/Desktop/Django-Three-Project/Three-project/.venv'
+VIRTUAL_ENV='/Users/ijeongho/Desktop/Mini/DJANGO-MINI-PROJECT/.venv'
 if ([ "$OSTYPE" = "cygwin" ] || [ "$OSTYPE" = "msys" ]) && $(command -v cygpath &> /dev/null) ; then
     VIRTUAL_ENV=$(cygpath -u "$VIRTUAL_ENV")
 fi
@@ -98,8 +98,8 @@ _OLD_VIRTUAL_PATH="$PATH"
 PATH="$VIRTUAL_ENV/bin:$PATH"
 export PATH
 
-if [ "xThree-project" != x ] ; then
-    VIRTUAL_ENV_PROMPT="Three-project"
+if [ "xDJANGO-MINI-PROJECT" != x ] ; then
+    VIRTUAL_ENV_PROMPT="DJANGO-MINI-PROJECT"
 else
     VIRTUAL_ENV_PROMPT=$(basename "$VIRTUAL_ENV")
 fi

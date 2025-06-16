@@ -31,15 +31,15 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
-setenv VIRTUAL_ENV '/Users/ijeongho/Desktop/Django-Three-Project/Three-project/.venv'
+setenv VIRTUAL_ENV '/Users/ijeongho/Desktop/Mini/DJANGO-MINI-PROJECT/.venv'
 
 set _OLD_VIRTUAL_PATH="$PATH:q"
 setenv PATH "$VIRTUAL_ENV:q/bin:$PATH:q"
 
 
 
-if ('Three-project' != "") then
-    setenv VIRTUAL_ENV_PROMPT 'Three-project'
+if ('DJANGO-MINI-PROJECT' != "") then
+    setenv VIRTUAL_ENV_PROMPT 'DJANGO-MINI-PROJECT'
 else
     setenv VIRTUAL_ENV_PROMPT "$VIRTUAL_ENV:t:q"
 endif

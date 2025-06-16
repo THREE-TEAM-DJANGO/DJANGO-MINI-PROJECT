@@ -25,9 +25,9 @@
     @"%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-@for %%i in ("/Users/ijeongho/Desktop/Django-Three-Project/Three-project/.venv") do @set "VIRTUAL_ENV=%%~fi"
+@for %%i in ("/Users/ijeongho/Desktop/Mini/DJANGO-MINI-PROJECT/.venv") do @set "VIRTUAL_ENV=%%~fi"
 
-@set "VIRTUAL_ENV_PROMPT=Three-project"
+@set "VIRTUAL_ENV_PROMPT=DJANGO-MINI-PROJECT"
 @if NOT DEFINED VIRTUAL_ENV_PROMPT (
     @for %%d in ("%VIRTUAL_ENV%") do @set "VIRTUAL_ENV_PROMPT=%%~nxd"
 )

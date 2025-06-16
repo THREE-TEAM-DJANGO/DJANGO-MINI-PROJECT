@@ -53,7 +53,7 @@ export-env {
       }
     }
 
-    let virtual_env = '/Users/ijeongho/Desktop/Django-Three-Project/Three-project/.venv'
+    let virtual_env = '/Users/ijeongho/Desktop/Mini/DJANGO-MINI-PROJECT/.venv'
     let bin = 'bin'
 
     let is_windows = ($nu.os-info.family) == 'windows'
@@ -68,10 +68,10 @@ export-env {
     let new_path = ($env | get $path_name | prepend $venv_path)
 
     # If there is no default prompt, then use the env name instead
-    let virtual_env_prompt = (if ('Three-project' | is-empty) {
+    let virtual_env_prompt = (if ('DJANGO-MINI-PROJECT' | is-empty) {
         ($virtual_env | path basename)
     } else {
-        'Three-project'
+        'DJANGO-MINI-PROJECT'
     })
 
     let new_env = {
