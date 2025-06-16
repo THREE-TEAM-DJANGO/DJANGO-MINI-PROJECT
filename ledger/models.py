@@ -12,6 +12,20 @@ from member.models import User
 class Account(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     account_number = models.CharField(max_length=100, unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.account_number or self.account_number.strip() == '':
+            self.account_number = self.generate_account_number()  # 여기!!
+            super().save(*args, **kwargs)
+
+    def generate_account_number(self):
+        while True:
+            import random
+            number = str(random.randint(1000000000, 9999999999))  # 10자리 숫자
+            if not Account.objects.filter(account_number=number).exists():
+                return number
+
+
     balance = models.DecimalField(decimal_places=2, max_digits=20)
     initial_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
